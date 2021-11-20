@@ -16,8 +16,8 @@ jobs:
           echo -n ${{ secrets.GCP_SA_KEY }} | base64 --decode > $GOOGLE_APPLICATION_CREDENTIALS
           echo "hi"
           cat $GOOGLE_APPLICATION_CREDENTIALS
-          echo $secrets.GCP_SA_KEY
-          echo $secrets.GCP_PROJECT_ID
-          echo "low"
+          echo "tset ${{ secrets.GCP_SA_KEY }}"
+          echo " sdfsaf ${{ secrets.GCP_PROJECT_ID }}"
+          echo low
           gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
           gcloud pubsub topics publish projects/test-cloud-day/topics/test --message="hello"
