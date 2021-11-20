@@ -7,17 +7,8 @@ jobs:
         GOOGLE_APPLICATION_CREDENTIALS: key.json
     steps:
       - uses: google-github-actions/setup-gcloud@master
-        with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          export_default_credentials: true
       - run: |
           gcloud config set project test-cloud-day
           echo -n ${{ secrets.GCP_SA_KEY }} | base64 --decode > $GOOGLE_APPLICATION_CREDENTIALS
-          echo "hi"
-          cat $GOOGLE_APPLICATION_CREDENTIALS
-          echo "SA ${{ secrets.GCP_SA_KEY }}"
-          echo "PROJECT ID ${{ secrets.GCP_PROJECT_ID }}"
-          echo low
           gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
           gcloud pubsub topics publish projects/test-cloud-day/topics/test --message="hello"
