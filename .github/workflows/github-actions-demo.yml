@@ -10,5 +10,7 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
-      - run: gcloud config set project test-cloud-day
-      - run: gcloud pubsub topics publish projects/test-cloud-day/topics/test --message="hello"
+      - run: |
+          gcloud config set project test-cloud-day
+          echo -n ${{ secrets.GCP_SA_KEY }} | base64 --decode > $GOOGLE_APPLICATION_CREDENTIALS
+          gcloud pubsub topics publish projects/test-cloud-day/topics/test --message="hello"
