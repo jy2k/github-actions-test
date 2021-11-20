@@ -6,12 +6,12 @@ jobs:
     env:
         GOOGLE_APPLICATION_CREDENTIALS: key.json
     steps:
-      - uses: actions/checkout@v2
-      - uses: google-github-actions/setup-gcloud@master
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
+      - uses: actions/checkout@v2
+      - uses: google-github-actions/setup-gcloud@master
       - run: |
           gcloud config set project test-cloud-day
           echo -n ${{ secrets.GCP_SA_KEY }} | base64 --decode > $GOOGLE_APPLICATION_CREDENTIALS
