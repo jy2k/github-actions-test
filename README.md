@@ -10,6 +10,7 @@ The Workflow:
 5. Pipeline trains a model
 
 
+
 This is a rough diagram of the end-to-end architecture:
 ![Screenshot](CI_CD_CT.png)
 
