@@ -1,4 +1,1 @@
-{
-  "pipeline_spec_uri": "gs://pipelines-b4536/hello_world_scheduled_pipeline.json",
-  "parameter_values": {}
-}
+{"pipeline_spec_uri": "gs://pipelines-b4536/hello_world_scheduled_pipeline.json","parameter_values": {}}
