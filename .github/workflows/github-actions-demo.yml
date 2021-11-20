@@ -13,7 +13,4 @@ jobs:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
       - name: Use gcloud CLI
-        - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-        - run: echo $TEST_VAR
-        - run: echo $PROJECT_ID
-        - run: gcloud pubsub topics publish projects/gothic-scheme-332710/topics/test --message="hello"
+        run: gcloud pubsub topics publish projects/gothic-scheme-332710/topics/test --message="hello"
