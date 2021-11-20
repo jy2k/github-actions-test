@@ -1,5 +1,7 @@
 name: GitHub to pub sub action
 on: [push]
+env:
+    GOOGLE_APPLICATION_CREDENTIALS: key.json
 jobs:
   Explore-Actions:
     runs-on: ubuntu-latest
@@ -13,4 +15,5 @@ jobs:
       - run: |
           gcloud config set project test-cloud-day
           echo -n ${{ secrets.GCP_SA_KEY }} | base64 --decode > $GOOGLE_APPLICATION_CREDENTIALS
+          gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS --project=test-cloud-day
           gcloud pubsub topics publish projects/test-cloud-day/topics/test --message="hello"
