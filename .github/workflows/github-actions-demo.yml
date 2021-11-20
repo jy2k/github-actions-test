@@ -1,7 +1,5 @@
 name: GitHub to pub sub action
 on: [push]
-env:
-    GOOGLE_APPLICATION_CREDENTIALS: key.json
 jobs:
   Explore-Actions:
     runs-on: ubuntu-latest
