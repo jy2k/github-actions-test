@@ -17,6 +17,7 @@ jobs:
           echo "hi"
           cat $GOOGLE_APPLICATION_CREDENTIALS
           echo "tset ${{ secrets.GCP_SA_KEY }}"
+          echo "tset ${{ secrets.TEST }}"
           echo " sdfsaf ${{ secrets.GCP_PROJECT_ID }}"
           echo low
           gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
