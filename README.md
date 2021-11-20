@@ -6,12 +6,12 @@ The Workflow:
 2. The workflow sends a message to a pub/sub topic
 
 ## What's not in the repo:
-The message in pub/sub should trigger a training pipeline
-[Here](https://cloud.google.com/vertex-ai/docs/pipelines/trigger-pubsub) is how to write a cloud function that picks up on a pub/sub message
+The message in pub/sub should trigger a training pipeline.
+[Here](https://cloud.google.com/vertex-ai/docs/pipelines/trigger-pubsub) is how to write a cloud function that picks up on a pub/sub message and triggers a pipeline.
 
-Potentially you could start any piece of code in the cloud function - for example [here](https://github.com/jy2k/Kubeflow-v2-end-to-end) is an end-to-end pipeline.
+Potentially you could start any piece of code in the cloud function - for example [here](https://github.com/jy2k/Kubeflow-v2-end-to-end) is an end-to-end pipeline that can be triggered.
 
-The example for architecture in mind:
+This is a rough diagram of the end-to-end architecture:
 ![Screenshot](CI_CD_CT.png)
 
 ### Misc
