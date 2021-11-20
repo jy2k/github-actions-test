@@ -14,6 +14,10 @@ jobs:
       - run: |
           gcloud config set project test-cloud-day
           echo -n ${{ secrets.GCP_SA_KEY }} | base64 --decode > $GOOGLE_APPLICATION_CREDENTIALS
+          echo hi
           cat $GOOGLE_APPLICATION_CREDENTIALS
+          echo ${{ secrets.GCP_SA_KEY }}
+          echo ${{ secrets.GCP_PROJECT_ID }}
+          echo low
           gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
           gcloud pubsub topics publish projects/test-cloud-day/topics/test --message="hello"
