@@ -9,7 +9,7 @@ The Workflow:
 4. Cloud Function decodes message and starts pipelines
 5. Pipeline trains a model
 
-Important to configure your project to run with vertex pipelines (some APIs need to be enabled)
+Important to configure your project to run with vertex pipelines - [some APIs need to be enabled](https://console.cloud.google.com/vertex-ai/locations/us-central1/pipelines/runs/hello-world-scheduled-pipeline-20211120225731?project=1065652454167)
 
 This is a rough diagram of the end-to-end architecture:
 ![Screenshot](CI_CD_CT.png)
