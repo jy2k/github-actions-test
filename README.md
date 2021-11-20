@@ -9,6 +9,7 @@ The Workflow:
 4. Cloud Function decodes message and starts pipelines
 5. Pipeline trains a model
 
+
 This is a rough diagram of the end-to-end architecture:
 ![Screenshot](CI_CD_CT.png)
 
