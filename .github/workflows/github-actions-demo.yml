@@ -1,10 +1,10 @@
 name: GitHub to pub sub action
 on: [push]
-env:
-    GOOGLE_APPLICATION_CREDENTIALS: key.json
 jobs:
   Explore-Actions:
     runs-on: ubuntu-latest
+    env:
+        GOOGLE_APPLICATION_CREDENTIALS: key.json
     steps:
       - uses: actions/checkout@v2
       - uses: google-github-actions/setup-gcloud@master
