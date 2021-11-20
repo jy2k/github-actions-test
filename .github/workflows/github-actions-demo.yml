@@ -1,7 +1,7 @@
 name: GitHub to pub sub action
 on: [push]
 jobs:
-  Explore-GitHub-Actions:
+  Explore-Actions:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
