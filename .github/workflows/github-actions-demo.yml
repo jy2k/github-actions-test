@@ -1,7 +1,5 @@
 name: GitHub to pub sub action
 on: [push]
-env:
-  TEST_VAR: mYBAR
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
@@ -12,5 +10,7 @@ jobs:
           PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
+      - name: Authorize
+        run: gcloud auth
       - name: Use gcloud CLI
         run: gcloud pubsub topics publish projects/test-cloud-day/topics/test --message="hello"
