@@ -11,4 +11,4 @@ jobs:
           gcloud config set project test-cloud-day
           echo -n ${{ secrets.GCP_SA_KEY }} | base64 --decode > $GOOGLE_APPLICATION_CREDENTIALS
           gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
-          gcloud pubsub topics publish projects/test-cloud-day/topics/test --message='{"pipeline_spec_uri": "gs://pipelines-b4536/hello_world_scheduled_pipeline.json","parameter_values": {"greet_name": "something something darkside"}}'
+          gcloud pubsub topics publish projects/test-cloud-day/topics/test --message='{"pipeline_spec_uri": "gs://pipelines-b4536/end-to-end-pytorch.json","parameter_values": {"greet_name": "something something darkside"}}'

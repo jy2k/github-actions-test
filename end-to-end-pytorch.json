@@ -1,0 +1,421 @@
+{
+  "pipelineSpec": {
+    "components": {
+      "comp-endpoint-create": {
+        "executorLabel": "exec-endpoint-create",
+        "outputDefinitions": {
+          "artifacts": {
+            "endpoint": {
+              "artifactType": {
+                "schemaTitle": "system.Artifact",
+                "schemaVersion": "0.0.1"
+              }
+            }
+          }
+        }
+      },
+      "comp-model-deploy": {
+        "executorLabel": "exec-model-deploy",
+        "inputDefinitions": {
+          "artifacts": {
+            "endpoint": {
+              "artifactType": {
+                "schemaTitle": "system.Artifact",
+                "schemaVersion": "0.0.1"
+              }
+            },
+            "model": {
+              "artifactType": {
+                "schemaTitle": "system.Model",
+                "schemaVersion": "0.0.1"
+              }
+            }
+          }
+        },
+        "outputDefinitions": {
+          "artifacts": {
+            "endpoint": {
+              "artifactType": {
+                "schemaTitle": "system.Artifact",
+                "schemaVersion": "0.0.1"
+              }
+            }
+          }
+        }
+      },
+      "comp-model-upload": {
+        "executorLabel": "exec-model-upload",
+        "inputDefinitions": {
+          "parameters": {
+            "artifact_uri": {
+              "type": "STRING"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "artifacts": {
+            "model": {
+              "artifactType": {
+                "schemaTitle": "system.Model",
+                "schemaVersion": "0.0.1"
+              }
+            }
+          }
+        }
+      },
+      "comp-preprocess": {
+        "executorLabel": "exec-preprocess",
+        "outputDefinitions": {
+          "artifacts": {
+            "output_csv_path": {
+              "artifactType": {
+                "schemaTitle": "system.Artifact",
+                "schemaVersion": "0.0.1"
+              }
+            }
+          }
+        }
+      },
+      "comp-train": {
+        "executorLabel": "exec-train",
+        "inputDefinitions": {
+          "artifacts": {
+            "input_csv_path": {
+              "artifactType": {
+                "schemaTitle": "system.Artifact",
+                "schemaVersion": "0.0.1"
+              }
+            }
+          },
+          "parameters": {
+            "bucket": {
+              "type": "STRING"
+            },
+            "experiment_name": {
+              "type": "STRING"
+            },
+            "num_epochs": {
+              "type": "INT"
+            },
+            "project_id": {
+              "type": "STRING"
+            },
+            "run_name": {
+              "type": "STRING"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "artifacts": {
+            "saved_model": {
+              "artifactType": {
+                "schemaTitle": "system.Model",
+                "schemaVersion": "0.0.1"
+              }
+            }
+          },
+          "parameters": {
+            "artifact_uri": {
+              "type": "STRING"
+            }
+          }
+        }
+      }
+    },
+    "deploymentSpec": {
+      "executors": {
+        "exec-endpoint-create": {
+          "container": {
+            "args": [
+              "--method.project",
+              "test-cloud-day",
+              "--method.display_name",
+              "pipelines20211213151347",
+              "--executor_input",
+              "{{$}}",
+              "--resource_name_output_artifact_uri",
+              "{{$.outputs.artifacts['endpoint'].uri}}"
+            ],
+            "command": [
+              "python3",
+              "-m",
+              "google_cloud_pipeline_components.aiplatform.remote_runner",
+              "--cls_name",
+              "Endpoint",
+              "--method_name",
+              "create"
+            ],
+            "image": "gcr.io/ml-pipeline/google-cloud-pipeline-components:0.1.1"
+          }
+        },
+        "exec-model-deploy": {
+          "container": {
+            "args": [
+              "--init.project",
+              "test-cloud-day",
+              "--method.deployed_model_display_name",
+              "model_display_name",
+              "--method.machine_type",
+              "n1-standard-4",
+              "--executor_input",
+              "{{$}}",
+              "--resource_name_output_artifact_uri",
+              "{{$.outputs.artifacts['endpoint'].uri}}",
+              "--method.endpoint",
+              "{{$.inputs.artifacts['endpoint'].uri}}",
+              "--init.model_name",
+              "{{$.inputs.artifacts['model'].uri}}"
+            ],
+            "command": [
+              "python3",
+              "-m",
+              "google_cloud_pipeline_components.aiplatform.remote_runner",
+              "--cls_name",
+              "Model",
+              "--method_name",
+              "deploy"
+            ],
+            "image": "gcr.io/ml-pipeline/google-cloud-pipeline-components:0.1.1"
+          }
+        },
+        "exec-model-upload": {
+          "container": {
+            "args": [
+              "--method.project",
+              "test-cloud-day",
+              "--method.display_name",
+              "model20211213151347",
+              "--method.serving_container_image_uri",
+              "us-docker.pkg.dev/vertex-ai/prediction/sklearn-cpu.0-24:latest",
+              "--executor_input",
+              "{{$}}",
+              "--resource_name_output_artifact_uri",
+              "{{$.outputs.artifacts['model'].uri}}",
+              "--method.artifact_uri",
+              "{{$.inputs.parameters['artifact_uri']}}"
+            ],
+            "command": [
+              "python3",
+              "-m",
+              "google_cloud_pipeline_components.aiplatform.remote_runner",
+              "--cls_name",
+              "Model",
+              "--method_name",
+              "upload"
+            ],
+            "image": "gcr.io/ml-pipeline/google-cloud-pipeline-components:0.1.1"
+          }
+        },
+        "exec-preprocess": {
+          "container": {
+            "args": [
+              "--executor_input",
+              "{{$}}",
+              "--function_to_execute",
+              "preprocess"
+            ],
+            "command": [
+              "sh",
+              "-c",
+              "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'pandas' 'google-cloud-aiplatform' 'google-cloud-bigquery-storage' 'google-cloud-bigquery' 'pyarrow' 'kfp==1.8.10' && \"$0\" \"$@\"\n",
+              "sh",
+              "-ec",
+              "program_path=$(mktemp -d)\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\npython3 -m kfp.v2.components.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+              "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing import *\n\ndef preprocess(output_csv_path: OutputPath('CSV')):\n    #1\n    from google.cloud import bigquery\n    import google.auth\n\n    creds, project = google.auth.default()\n    client = bigquery.Client(project='test-cloud-day', credentials=creds)\n\n    query =     \"\"\"\n            SELECT * FROM `test-cloud-day.imdb.imdb_review_sentiment_strings`\n    \"\"\"\n    print(query)\n\n    dataframe = client.query(query).to_dataframe()\n    print(dataframe.head())\n\n    dataframe.to_csv(output_csv_path)\n    print(\"done\")\n\n"
+            ],
+            "image": "python:3.7"
+          }
+        },
+        "exec-train": {
+          "container": {
+            "args": [
+              "--executor_input",
+              "{{$}}",
+              "--function_to_execute",
+              "train"
+            ],
+            "command": [
+              "sh",
+              "-c",
+              "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'pandas' 'imbalanced-learn' 'google-cloud-aiplatform' 'pyarrow' 'kfp==1.8.10' && \"$0\" \"$@\"\n",
+              "sh",
+              "-ec",
+              "program_path=$(mktemp -d)\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\npython3 -m kfp.v2.components.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+              "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing import *\n\ndef train(input_csv_path: InputPath('CSV'), saved_model: Output[Model], artifact_uri: OutputPath(str), experiment_name: str, run_name: str, num_epochs: int, project_id: str, bucket: str):\n    from google.cloud import aiplatform\n    from typing import NamedTuple\n\n    aiplatform.init(\n        project=project_id,\n        location='us-central1',\n        staging_bucket=bucket,\n        experiment=experiment_name,\n    )\n\n    aiplatform.start_run(run_name)\n    parameters = {\"epochs\": num_epochs}\n    aiplatform.log_params(parameters)\n\n    #1\n    import pandas as pd\n    from imblearn.under_sampling import  RandomUnderSampler\n    df_review = pd.read_csv(input_csv_path)\n    print(len(df_review))\n\n    df_positive = df_review[df_review['string_field_1']=='positive'][:9000]\n    df_negative = df_review[df_review['string_field_1']=='negative'][:1000]\n\n    df_review_imb = pd.concat([df_positive, df_negative])\n    df_review_imb.value_counts(['string_field_1'])\n\n    print(len(df_review_imb))\n    rus = RandomUnderSampler(random_state=0)\n    df_review_bal, df_review_bal['string_field_1']=rus.fit_resample(df_review_imb[['string_field_0']], df_review_imb['string_field_1'])\n\n    print(len(df_review_bal))\n    from sklearn.model_selection import train_test_split\n\n    train, test = train_test_split(df_review_bal, test_size=0.33, random_state=42)\n    train_x, train_y = train['string_field_0'], train['string_field_1']\n    test_x, test_y = test['string_field_0'], test['string_field_1']\n\n    print(\"train x values count\")\n    print(len(train_x))\n    print(\"train y values count\")\n    print(train_y.value_counts())\n\n    from sklearn.feature_extraction.text import TfidfVectorizer\n\n    tfidf = TfidfVectorizer(stop_words='english')\n    train_x_vector = tfidf.fit_transform(train_x)\n    test_x_vector = tfidf.transform(test_x)\n\n    print(train_x_vector)\n    from sklearn.svm import SVC\n\n    svc = SVC(kernel='linear')\n    svc.fit(train_x_vector, train_y)\n\n    print(svc.score(test_x_vector, test_y))\n\n    #aiplatform.log_metrics({\"accuracy\": accu})\n    import joblib\n    import os\n\n    joblib.dump(svc, os.path.join(saved_model.path.replace(\"saved_model\",\"\"), 'model.joblib'))\n    print(\" saved_model.path: \"+ saved_model.path)\n    print(\" saved_model.uri: \"+ saved_model.uri)\n    with open(artifact_uri, 'w') as f:\n        f.write(saved_model.uri.replace(\"saved_model\",\"\"))\n\n    print(saved_model.uri)  \n\n"
+            ],
+            "image": "python:3.7"
+          }
+        }
+      }
+    },
+    "pipelineInfo": {
+      "name": "train-scikit2e149bd9-c559-40b6-84be-25223b08b420"
+    },
+    "root": {
+      "dag": {
+        "tasks": {
+          "endpoint-create": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-endpoint-create"
+            },
+            "taskInfo": {
+              "name": "endpoint-create"
+            }
+          },
+          "model-deploy": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-model-deploy"
+            },
+            "dependentTasks": [
+              "endpoint-create",
+              "model-upload"
+            ],
+            "inputs": {
+              "artifacts": {
+                "endpoint": {
+                  "taskOutputArtifact": {
+                    "outputArtifactKey": "endpoint",
+                    "producerTask": "endpoint-create"
+                  }
+                },
+                "model": {
+                  "taskOutputArtifact": {
+                    "outputArtifactKey": "model",
+                    "producerTask": "model-upload"
+                  }
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "model-deploy"
+            }
+          },
+          "model-upload": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-model-upload"
+            },
+            "dependentTasks": [
+              "train"
+            ],
+            "inputs": {
+              "parameters": {
+                "artifact_uri": {
+                  "taskOutputParameter": {
+                    "outputParameterKey": "artifact_uri",
+                    "producerTask": "train"
+                  }
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "model-upload"
+            }
+          },
+          "preprocess": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-preprocess"
+            },
+            "taskInfo": {
+              "name": "preprocess"
+            }
+          },
+          "train": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-train"
+            },
+            "dependentTasks": [
+              "preprocess"
+            ],
+            "inputs": {
+              "artifacts": {
+                "input_csv_path": {
+                  "taskOutputArtifact": {
+                    "outputArtifactKey": "output_csv_path",
+                    "producerTask": "preprocess"
+                  }
+                }
+              },
+              "parameters": {
+                "bucket": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "pipelines-b4536"
+                    }
+                  }
+                },
+                "experiment_name": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "test-20211213151347"
+                    }
+                  }
+                },
+                "num_epochs": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "intValue": "1"
+                    }
+                  }
+                },
+                "project_id": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "test-cloud-day"
+                    }
+                  }
+                },
+                "run_name": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "test-run-20211213151347"
+                    }
+                  }
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "train"
+            }
+          }
+        }
+      },
+      "inputDefinitions": {
+        "parameters": {
+          "bucket": {
+            "type": "STRING"
+          },
+          "project": {
+            "type": "STRING"
+          }
+        }
+      }
+    },
+    "schemaVersion": "2.0.0",
+    "sdkVersion": "kfp-1.8.10"
+  },
+  "runtimeConfig": {
+    "parameters": {
+      "bucket": {
+        "stringValue": "pipelines-b4536"
+      },
+      "project": {
+        "stringValue": "test-cloud-day"
+      }
+    }
+  }
+}
