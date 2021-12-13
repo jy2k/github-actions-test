@@ -2,7 +2,6 @@
 
 A Github Workflow located at [.github/workflows/github-actions-demo.yml](https://github.com/jy2k/github-actions-test/tree/main/.github/workflows).
 
-
 The Workflow:
 1. Once a push is made to the repo the workflow triggers
 2. The workflow sends a message to a pub/sub topic
