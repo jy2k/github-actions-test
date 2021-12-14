@@ -7,6 +7,7 @@ from kfp.v2.dsl import component
 @component
 def hello_world(message: str) -> str:
     greeting_str = f'Hello, {message}'
+    #change something
     print(greeting_str)
     return greeting_str
 
